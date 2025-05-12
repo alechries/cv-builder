@@ -1,32 +1,38 @@
 body {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-  max-width: 600px;
+  font-family: sans-serif;
+  max-width: 800px;
   margin: auto;
+  padding: 20px;
 }
 
-form {
-  margin-bottom: 30px;
-}
-
-label {
-  display: block;
-  margin-bottom: 10px;
+form input, form textarea {
+  width: 100%;
+  margin: 5px 0;
+  padding: 8px;
+  font-size: 14px;
 }
 
 #preview {
+  margin-top: 30px;
+  padding: 20px;
   border: 1px solid #ccc;
-  padding: 15px;
   background: #f9f9f9;
 }
 
-@media print {
-  body {
-    background: white;
-    color: black;
-  }
-  #preview {
-    border: none;
-    background: none;
-  }
+.top {
+  display: flex;
+  align-items: center;
+}
+
+.top img {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  margin-right: 20px;
+  object-fit: cover;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
 }
