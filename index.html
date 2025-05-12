@@ -2,44 +2,53 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Создание резюме</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --medium-gray: #ddd;
+            --dark-gray: #7f8c8d;
+            --white: #fff;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
         }
         
         h1, h2 {
-            color: #2c3e50;
+            color: var(--secondary-color);
+            margin-top: 0;
         }
         
         .container {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            padding: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        .form-section {
-            flex: 1;
-            background: white;
+        .form-section, .preview-section {
+            background: var(--white);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .preview-section {
-            flex: 1;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
         
         .form-group {
@@ -50,6 +59,7 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 600;
+            font-size: 14px;
         }
         
         input[type="text"],
@@ -57,10 +67,10 @@
         input[type="tel"],
         textarea {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
+            padding: 10px;
+            border: 1px solid var(--medium-gray);
             border-radius: 4px;
-            box-sizing: border-box;
+            font-size: 16px;
         }
         
         textarea {
@@ -69,55 +79,82 @@
         }
         
         button {
-            background-color: #3498db;
-            color: white;
+            background-color: var(--primary-color);
+            color: var(--white);
             border: none;
-            padding: 10px 15px;
+            padding: 12px 15px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
             margin-right: 10px;
             margin-top: 10px;
+            transition: background-color 0.3s;
         }
         
         button:hover {
             background-color: #2980b9;
         }
         
+        button.secondary {
+            background-color: var(--medium-gray);
+            color: var(--text-color);
+        }
+        
+        button.danger {
+            background-color: #e74c3c;
+        }
+        
         .saved-resumes {
             margin-top: 20px;
+            border-top: 1px solid var(--medium-gray);
+            padding-top: 20px;
         }
         
         .resume-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
         }
         
-        .resume-item:hover {
-            background-color: #f9f9f9;
+        .resume-item:last-child {
+            border-bottom: none;
+        }
+        
+        .resume-item-info {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 10px;
+        }
+        
+        .resume-item-actions {
+            display: flex;
+            gap: 5px;
         }
         
         .resume-preview {
-            background: white;
-            padding: 30px;
+            background: var(--white);
+            padding: 25px;
             min-height: 100%;
+            font-size: 14px;
         }
         
         .resume-header {
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
             margin-bottom: 20px;
         }
         
         .resume-header h1 {
-            margin: 0;
-            color: #2c3e50;
+            margin: 0 0 5px 0;
+            font-size: 24px;
         }
         
         .resume-header p {
             margin: 5px 0;
-            color: #7f8c8d;
+            color: var(--dark-gray);
         }
         
         .resume-section {
@@ -125,10 +162,10 @@
         }
         
         .resume-section h2 {
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--medium-gray);
             padding-bottom: 5px;
-            color: #2c3e50;
             font-size: 18px;
+            margin-bottom: 10px;
         }
         
         .experience-item, .education-item {
@@ -136,35 +173,86 @@
         }
         
         .experience-item h3, .education-item h3 {
-            margin: 0;
+            margin: 0 0 5px 0;
             font-size: 16px;
         }
         
         .experience-date, .education-date {
-            color: #7f8c8d;
+            color: var(--dark-gray);
             font-style: italic;
+            font-size: 14px;
+            margin-bottom: 5px;
         }
         
         .skills-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
         
         .skill-tag {
             background-color: #e0f7fa;
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 15px;
             font-size: 14px;
+        }
+        
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .pdf-export-notice {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 14px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+                gap: 20px;
+            }
+            
+            .form-section, .preview-section {
+                flex: 1;
+                margin-bottom: 0;
+            }
+            
+            .resume-preview {
+                font-size: 16px;
+            }
+        }
+        
+        /* Стили для PDF */
+        .pdf-mode {
+            width: 210mm !important;
+            padding: 20mm !important;
+            font-size: 12pt !important;
+            line-height: 1.5 !important;
+        }
+        
+        .pdf-mode .resume-header h1 {
+            font-size: 20pt !important;
+        }
+        
+        .pdf-mode .resume-section h2 {
+            font-size: 14pt !important;
         }
     </style>
 </head>
 <body>
-    <h1>Создание резюме</h1>
-    
     <div class="container">
         <div class="form-section">
-            <h2>Основная информация</h2>
+            <h1>Создание резюме</h1>
+            
             <div class="form-group">
                 <label for="fullName">ФИО</label>
                 <input type="text" id="fullName" required>
@@ -197,25 +285,25 @@
             
             <h2>Опыт работы</h2>
             <div id="experienceContainer">
-                <div class="experience-form">
+                <div class="experience-form" data-id="exp1">
                     <div class="form-group">
-                        <label for="expCompany">Компания</label>
-                        <input type="text" id="expCompany">
+                        <label>Компания</label>
+                        <input type="text" class="exp-input exp-company" data-id="exp1">
                     </div>
                     
                     <div class="form-group">
-                        <label for="expPosition">Должность</label>
-                        <input type="text" id="expPosition">
+                        <label>Должность</label>
+                        <input type="text" class="exp-input exp-position" data-id="exp1">
                     </div>
                     
                     <div class="form-group">
-                        <label for="expPeriod">Период работы</label>
-                        <input type="text" id="expPeriod" placeholder="Пример: 2018-2022">
+                        <label>Период работы</label>
+                        <input type="text" class="exp-input exp-period" data-id="exp1" placeholder="Пример: 2018-2022">
                     </div>
                     
                     <div class="form-group">
-                        <label for="expDescription">Описание</label>
-                        <textarea id="expDescription"></textarea>
+                        <label>Описание</label>
+                        <textarea class="exp-input exp-description" data-id="exp1"></textarea>
                     </div>
                 </div>
             </div>
@@ -223,20 +311,20 @@
             
             <h2>Образование</h2>
             <div id="educationContainer">
-                <div class="education-form">
+                <div class="education-form" data-id="edu1">
                     <div class="form-group">
-                        <label for="eduInstitution">Учебное заведение</label>
-                        <input type="text" id="eduInstitution">
+                        <label>Учебное заведение</label>
+                        <input type="text" class="edu-input edu-institution" data-id="edu1">
                     </div>
                     
                     <div class="form-group">
-                        <label for="eduSpecialty">Специальность</label>
-                        <input type="text" id="eduSpecialty">
+                        <label>Специальность</label>
+                        <input type="text" class="edu-input edu-specialty" data-id="edu1">
                     </div>
                     
                     <div class="form-group">
-                        <label for="eduPeriod">Период обучения</label>
-                        <input type="text" id="eduPeriod" placeholder="Пример: 2014-2018">
+                        <label>Период обучения</label>
+                        <input type="text" class="edu-input edu-period" data-id="edu1" placeholder="Пример: 2014-2018">
                     </div>
                 </div>
             </div>
@@ -255,6 +343,10 @@
             
             <button id="saveResume">Сохранить резюме</button>
             <button id="exportPdf">Экспорт в PDF</button>
+            
+            <div class="pdf-export-notice">
+                <strong>Совет:</strong> Для лучшего результата при экспорте в PDF заполните все разделы и проверьте предпросмотр перед генерацией.
+            </div>
             
             <div class="saved-resumes">
                 <h2>Сохранённые резюме</h2>
@@ -331,6 +423,7 @@
         const saveResumeBtn = document.getElementById('saveResume');
         const exportPdfBtn = document.getElementById('exportPdf');
         const resumeList = document.getElementById('resumeList');
+        const resumePreview = document.getElementById('resumePreview');
         
         // Preview элементы
         const previewFullName = document.getElementById('previewFullName');
@@ -350,6 +443,10 @@
             addEducationBtn.addEventListener('click', addEducationField);
             saveResumeBtn.addEventListener('click', saveResume);
             exportPdfBtn.addEventListener('click', exportToPdf);
+            
+            // Добавляем первый опыт и образование
+            addRemoveButton(document.querySelector('.experience-form'));
+            addRemoveButton(document.querySelector('.education-form'));
         });
         
         function setupInputListeners() {
@@ -377,7 +474,7 @@
         }
         
         function addExperienceField() {
-            const expId = Date.now();
+            const expId = 'exp' + Date.now();
             const expHtml = `
                 <div class="experience-form" data-id="${expId}">
                     <div class="form-group">
@@ -399,29 +496,22 @@
                         <label>Описание</label>
                         <textarea class="exp-input exp-description" data-id="${expId}"></textarea>
                     </div>
-                    <button class="remove-exp" data-id="${expId}">Удалить</button>
                 </div>
             `;
             
             experienceContainer.insertAdjacentHTML('beforeend', expHtml);
-            
-            // Добавляем обработчик для кнопки удаления
-            document.querySelector(`.remove-exp[data-id="${expId}"]`).addEventListener('click', function() {
-                this.parentElement.remove();
-                updatePreview();
-            });
+            const newExpForm = document.querySelector(`.experience-form[data-id="${expId}"]`);
+            addRemoveButton(newExpForm);
             
             // Добавляем слушатели для новых полей ввода
-            const newInputs = document.querySelectorAll(`[data-id="${expId}"]`);
+            const newInputs = newExpForm.querySelectorAll('.exp-input');
             newInputs.forEach(input => {
-                if (input.classList.contains('exp-input')) {
-                    input.addEventListener('input', updatePreview);
-                }
+                input.addEventListener('input', updatePreview);
             });
         }
         
         function addEducationField() {
-            const eduId = Date.now();
+            const eduId = 'edu' + Date.now();
             const eduHtml = `
                 <div class="education-form" data-id="${eduId}">
                     <div class="form-group">
@@ -438,25 +528,34 @@
                         <label>Период обучения</label>
                         <input type="text" class="edu-input edu-period" data-id="${eduId}" placeholder="Пример: 2014-2018">
                     </div>
-                    <button class="remove-edu" data-id="${eduId}">Удалить</button>
                 </div>
             `;
             
             educationContainer.insertAdjacentHTML('beforeend', eduHtml);
-            
-            // Добавляем обработчик для кнопки удаления
-            document.querySelector(`.remove-edu[data-id="${eduId}"]`).addEventListener('click', function() {
-                this.parentElement.remove();
-                updatePreview();
-            });
+            const newEduForm = document.querySelector(`.education-form[data-id="${eduId}"]`);
+            addRemoveButton(newEduForm);
             
             // Добавляем слушатели для новых полей ввода
-            const newInputs = document.querySelectorAll(`[data-id="${eduId}"]`);
+            const newInputs = newEduForm.querySelectorAll('.edu-input');
             newInputs.forEach(input => {
-                if (input.classList.contains('edu-input')) {
-                    input.addEventListener('input', updatePreview);
+                input.addEventListener('input', updatePreview);
+            });
+        }
+        
+        function addRemoveButton(formElement) {
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn secondary';
+            removeBtn.textContent = 'Удалить';
+            removeBtn.type = 'button';
+            
+            removeBtn.addEventListener('click', function() {
+                if (confirm('Удалить этот блок?')) {
+                    formElement.remove();
+                    updatePreview();
                 }
             });
+            
+            formElement.appendChild(removeBtn);
         }
         
         function updatePreview() {
@@ -496,7 +595,7 @@
                     expItem.innerHTML = `
                         <h3>${position} в компании "${company}"</h3>
                         <p class="experience-date">${period}</p>
-                        <p>${description}</p>
+                        <p>${description.replace(/\n/g, '<br>')}</p>
                     `;
                     
                     previewExperience.appendChild(expItem);
@@ -608,13 +707,27 @@
                 return;
             }
             
-            Object.entries(savedResumes).forEach(([name, data]) => {
+            // Сортируем резюме по дате создания (новые сверху)
+            const sortedResumes = Object.entries(savedResumes).sort((a, b) => {
+                return new Date(b[1].createdAt) - new Date(a[1].createdAt);
+            });
+            
+            sortedResumes.forEach(([name, data]) => {
                 const resumeItem = document.createElement('div');
                 resumeItem.className = 'resume-item';
+                
+                const date = new Date(data.createdAt);
+                const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
                 resumeItem.innerHTML = `
-                    <strong>${name}</strong> (${new Date(data.createdAt).toLocaleDateString()})
-                    <button class="load-resume" data-name="${name}">Загрузить</button>
-                    <button class="delete-resume" data-name="${name}">Удалить</button>
+                    <div class="resume-item-info">
+                        <strong>${name}</strong><br>
+                        <small>${formattedDate}</small>
+                    </div>
+                    <div class="resume-item-actions">
+                        <button class="load-resume" data-name="${name}">Загрузить</button>
+                        <button class="delete-resume danger" data-name="${name}">Удалить</button>
+                    </div>
                 `;
                 
                 resumeList.appendChild(resumeItem);
@@ -664,6 +777,9 @@
                     lastExp.querySelector('.exp-period').value = exp.period || '';
                     lastExp.querySelector('.exp-description').value = exp.description || '';
                 });
+            } else {
+                // Добавляем пустой блок, если нет опыта
+                addExperienceField();
             }
             
             // Заполняем образование
@@ -676,6 +792,9 @@
                     lastEdu.querySelector('.edu-specialty').value = edu.specialty || '';
                     lastEdu.querySelector('.edu-period').value = edu.period || '';
                 });
+            } else {
+                // Добавляем пустой блок, если нет образования
+                addEducationField();
             }
             
             updatePreview();
@@ -694,13 +813,35 @@
         }
         
         function exportToPdf() {
-            const resumePreview = document.getElementById('resumePreview');
+            // Создаем клон элемента предпросмотра для PDF
+            const pdfPreview = resumePreview.cloneNode(true);
+            pdfPreview.classList.add('pdf-mode');
+            pdfPreview.style.width = '210mm';
+            pdfPreview.style.padding = '20mm';
+            pdfPreview.style.fontSize = '12pt';
+            pdfPreview.style.lineHeight = '1.5';
             
-            html2canvas(resumePreview, {
+            // Временно добавляем клон в DOM
+            pdfPreview.style.position = 'absolute';
+            pdfPreview.style.left = '-9999px';
+            document.body.appendChild(pdfPreview);
+            
+            // Опции для html2canvas
+            const options = {
                 scale: 2,
                 logging: false,
-                useCORS: true
-            }).then(canvas => {
+                useCORS: true,
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: pdfPreview.scrollWidth,
+                windowHeight: pdfPreview.scrollHeight
+            };
+            
+            // Генерируем PDF
+            html2canvas(pdfPreview, options).then(canvas => {
+                // Удаляем временный элемент
+                document.body.removeChild(pdfPreview);
+                
                 const imgData = canvas.toDataURL('image/png');
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const imgWidth = 210; // A4 width in mm
@@ -720,7 +861,10 @@
                     heightLeft -= pageHeight;
                 }
                 
-                const fileName = fullNameInput.value ? `${fullNameInput.value}_резюме.pdf` : 'резюме.pdf';
+                const fileName = fullNameInput.value ? 
+                    `${fullNameInput.value.trim().replace(/\s+/g, '_')}_резюме.pdf` : 
+                    'резюме.pdf';
+                
                 pdf.save(fileName);
             });
         }
