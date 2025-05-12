@@ -1,28 +1,62 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Резюме</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Конструктор Резюме</h1>
+  <h1>Создай своё резюме</h1>
   <form id="resume-form">
-    <label>Имя: <input type="text" id="name" /></label>
-    <label>Профессия: <input type="text" id="title" /></label>
-    <label>О себе: <textarea id="about"></textarea></label>
+    <h2>Контакты</h2>
+    <input type="text" id="firstName" placeholder="Имя">
+    <input type="text" id="lastName" placeholder="Фамилия">
+    <input type="email" id="email" placeholder="Email">
+    <input type="tel" id="phone" placeholder="Телефон">
+    <input type="text" id="address" placeholder="Адрес (опционально)">
+    <input type="file" id="photo" accept="image/*">
+
+    <h2>О себе</h2>
+    <textarea id="summary" placeholder="Кратко о себе"></textarea>
+
+    <h2>Опыт работы</h2>
+    <textarea id="experience" placeholder="Например: Frontend-разработчик в XYZ (2022–2024)"></textarea>
+
+    <h2>Образование</h2>
+    <textarea id="education" placeholder="Например: Бакалавр ИТ — Университет ABC (2018–2022)"></textarea>
+
+    <h2>Навыки</h2>
+    <textarea id="skills" placeholder="HTML: 5\nCSS: 4\nJS: 5\nPython: 3"></textarea>
+
     <button type="button" onclick="saveData()">Сохранить</button>
     <button type="button" onclick="generatePDF()">Скачать PDF</button>
   </form>
 
+  <hr>
+
   <div id="preview">
-    <h2 id="preview-name">[Имя]</h2>
-    <h3 id="preview-title">[Профессия]</h3>
-    <p id="preview-about">[Описание]</p>
+    <div class="top">
+      <img id="preview-photo" src="" alt="Фото">
+      <div>
+        <h2 id="preview-name">Имя Фамилия</h2>
+        <p id="preview-contact"></p>
+      </div>
+    </div>
+    <h3>О себе</h3>
+    <p id="preview-summary"></p>
+
+    <h3>Опыт работы</h3>
+    <p id="preview-experience"></p>
+
+    <h3>Образование</h3>
+    <p id="preview-education"></p>
+
+    <h3>Навыки</h3>
+    <ul id="preview-skills"></ul>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="js/app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
