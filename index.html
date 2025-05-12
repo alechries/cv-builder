@@ -1,1 +1,28 @@
-<h1>CV-Builder</h1>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Резюме</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Конструктор Резюме</h1>
+  <form id="resume-form">
+    <label>Имя: <input type="text" id="name" /></label>
+    <label>Профессия: <input type="text" id="title" /></label>
+    <label>О себе: <textarea id="about"></textarea></label>
+    <button type="button" onclick="saveData()">Сохранить</button>
+    <button type="button" onclick="generatePDF()">Скачать PDF</button>
+  </form>
+
+  <div id="preview">
+    <h2 id="preview-name">[Имя]</h2>
+    <h3 id="preview-title">[Профессия]</h3>
+    <p id="preview-about">[Описание]</p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
