@@ -19,3 +19,14 @@ label {
   padding: 15px;
   background: #f9f9f9;
 }
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  #preview {
+    border: none;
+    background: none;
+  }
+}
