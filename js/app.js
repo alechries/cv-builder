@@ -26,6 +26,14 @@ function loadData() {
 }
 
 function generatePDF() {
+  // Обновляем preview перед генерацией
+  const data = {
+    name: document.getElementById('name').value,
+    title: document.getElementById('title').value,
+    about: document.getElementById('about').value
+  };
+  updatePreview(data); // Синхронизируем отображение
+
   const element = document.getElementById('preview');
   html2pdf().from(element).save('resume.pdf');
 }
