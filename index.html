@@ -1,62 +1,729 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Резюме</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание резюме</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1, h2 {
+            color: #2c3e50;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-section {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .preview-section {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .saved-resumes {
+            margin-top: 20px;
+        }
+        
+        .resume-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .resume-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .resume-preview {
+            background: white;
+            padding: 30px;
+            min-height: 100%;
+        }
+        
+        .resume-header {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .resume-header h1 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        
+        .resume-header p {
+            margin: 5px 0;
+            color: #7f8c8d;
+        }
+        
+        .resume-section {
+            margin-bottom: 20px;
+        }
+        
+        .resume-section h2 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .experience-item, .education-item {
+            margin-bottom: 15px;
+        }
+        
+        .experience-item h3, .education-item h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .experience-date, .education-date {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .skill-tag {
+            background-color: #e0f7fa;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Создай своё резюме</h1>
-  <form id="resume-form">
-    <h2>Контакты</h2>
-    <input type="text" id="firstName" placeholder="Имя">
-    <input type="text" id="lastName" placeholder="Фамилия">
-    <input type="email" id="email" placeholder="Email">
-    <input type="tel" id="phone" placeholder="Телефон">
-    <input type="text" id="address" placeholder="Адрес (опционально)">
-    <input type="file" id="photo" accept="image/*">
-
-    <h2>О себе</h2>
-    <textarea id="summary" placeholder="Кратко о себе"></textarea>
-
-    <h2>Опыт работы</h2>
-    <textarea id="experience" placeholder="Например: Frontend-разработчик в XYZ (2022–2024)"></textarea>
-
-    <h2>Образование</h2>
-    <textarea id="education" placeholder="Например: Бакалавр ИТ — Университет ABC (2018–2022)"></textarea>
-
-    <h2>Навыки</h2>
-    <textarea id="skills" placeholder="HTML: 5\nCSS: 4\nJS: 5\nPython: 3"></textarea>
-
-    <button type="button" onclick="saveData()">Сохранить</button>
-    <button type="button" onclick="generatePDF()">Скачать PDF</button>
-  </form>
-
-  <hr>
-
-  <div id="preview">
-    <div class="top">
-      <img id="preview-photo" src="" alt="Фото">
-      <div>
-        <h2 id="preview-name">Имя Фамилия</h2>
-        <p id="preview-contact"></p>
-      </div>
+    <h1>Создание резюме</h1>
+    
+    <div class="container">
+        <div class="form-section">
+            <h2>Основная информация</h2>
+            <div class="form-group">
+                <label for="fullName">ФИО</label>
+                <input type="text" id="fullName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="profession">Профессия / Должность</label>
+                <input type="text" id="profession" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Телефон</label>
+                <input type="tel" id="phone">
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Адрес</label>
+                <input type="text" id="address">
+            </div>
+            
+            <div class="form-group">
+                <label for="about">О себе</label>
+                <textarea id="about"></textarea>
+            </div>
+            
+            <h2>Опыт работы</h2>
+            <div id="experienceContainer">
+                <div class="experience-form">
+                    <div class="form-group">
+                        <label for="expCompany">Компания</label>
+                        <input type="text" id="expCompany">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expPosition">Должность</label>
+                        <input type="text" id="expPosition">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expPeriod">Период работы</label>
+                        <input type="text" id="expPeriod" placeholder="Пример: 2018-2022">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expDescription">Описание</label>
+                        <textarea id="expDescription"></textarea>
+                    </div>
+                </div>
+            </div>
+            <button id="addExperience">+ Добавить опыт</button>
+            
+            <h2>Образование</h2>
+            <div id="educationContainer">
+                <div class="education-form">
+                    <div class="form-group">
+                        <label for="eduInstitution">Учебное заведение</label>
+                        <input type="text" id="eduInstitution">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eduSpecialty">Специальность</label>
+                        <input type="text" id="eduSpecialty">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eduPeriod">Период обучения</label>
+                        <input type="text" id="eduPeriod" placeholder="Пример: 2014-2018">
+                    </div>
+                </div>
+            </div>
+            <button id="addEducation">+ Добавить образование</button>
+            
+            <h2>Навыки</h2>
+            <div class="form-group">
+                <label for="skills">Навыки (через запятую)</label>
+                <textarea id="skills" placeholder="Пример: HTML, CSS, JavaScript, Photoshop"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="resumeName">Название резюме (для сохранения)</label>
+                <input type="text" id="resumeName" placeholder="Моё резюме 2023">
+            </div>
+            
+            <button id="saveResume">Сохранить резюме</button>
+            <button id="exportPdf">Экспорт в PDF</button>
+            
+            <div class="saved-resumes">
+                <h2>Сохранённые резюме</h2>
+                <div id="resumeList"></div>
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <h2>Предпросмотр</h2>
+            <div id="resumePreview" class="resume-preview">
+                <div class="resume-header">
+                    <h1 id="previewFullName">Иванов Иван Иванович</h1>
+                    <p id="previewProfession">Веб-разработчик</p>
+                    <p id="previewContacts">example@email.com | +7 (123) 456-78-90 | г. Москва</p>
+                </div>
+                
+                <div class="resume-section">
+                    <h2>О себе</h2>
+                    <p id="previewAbout">Опытный веб-разработчик с более чем 5-летним стажем. Специализируюсь на создании адаптивных и пользовательских интерфейсов.</p>
+                </div>
+                
+                <div class="resume-section">
+                    <h2>Опыт работы</h2>
+                    <div id="previewExperience">
+                        <div class="experience-item">
+                            <h3>Веб-разработчик в компании "ТехноПарк"</h3>
+                            <p class="experience-date">2018-2022</p>
+                            <p>Разработка и поддержка клиентской части веб-приложений. Оптимизация производительности. Работа в команде с дизайнерами и бэкенд-разработчиками.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resume-section">
+                    <h2>Образование</h2>
+                    <div id="previewEducation">
+                        <div class="education-item">
+                            <h3>Московский Государственный Университет</h3>
+                            <p class="education-date">2014-2018</p>
+                            <p>Бакалавр компьютерных наук</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resume-section">
+                    <h2>Навыки</h2>
+                    <div id="previewSkills" class="skills-list">
+                        <span class="skill-tag">HTML</span>
+                        <span class="skill-tag">CSS</span>
+                        <span class="skill-tag">JavaScript</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <h3>О себе</h3>
-    <p id="preview-summary"></p>
 
-    <h3>Опыт работы</h3>
-    <p id="preview-experience"></p>
-
-    <h3>Образование</h3>
-    <p id="preview-education"></p>
-
-    <h3>Навыки</h3>
-    <ul id="preview-skills"></ul>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="app.js"></script>
+    <script>
+        // Инициализация jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // DOM элементы
+        const fullNameInput = document.getElementById('fullName');
+        const professionInput = document.getElementById('profession');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+        const addressInput = document.getElementById('address');
+        const aboutInput = document.getElementById('about');
+        const skillsInput = document.getElementById('skills');
+        const resumeNameInput = document.getElementById('resumeName');
+        
+        const experienceContainer = document.getElementById('experienceContainer');
+        const educationContainer = document.getElementById('educationContainer');
+        const addExperienceBtn = document.getElementById('addExperience');
+        const addEducationBtn = document.getElementById('addEducation');
+        const saveResumeBtn = document.getElementById('saveResume');
+        const exportPdfBtn = document.getElementById('exportPdf');
+        const resumeList = document.getElementById('resumeList');
+        
+        // Preview элементы
+        const previewFullName = document.getElementById('previewFullName');
+        const previewProfession = document.getElementById('previewProfession');
+        const previewContacts = document.getElementById('previewContacts');
+        const previewAbout = document.getElementById('previewAbout');
+        const previewExperience = document.getElementById('previewExperience');
+        const previewEducation = document.getElementById('previewEducation');
+        const previewSkills = document.getElementById('previewSkills');
+        
+        // Обработчики событий
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedResumes();
+            setupInputListeners();
+            
+            addExperienceBtn.addEventListener('click', addExperienceField);
+            addEducationBtn.addEventListener('click', addEducationField);
+            saveResumeBtn.addEventListener('click', saveResume);
+            exportPdfBtn.addEventListener('click', exportToPdf);
+        });
+        
+        function setupInputListeners() {
+            const inputs = [
+                fullNameInput, professionInput, emailInput, phoneInput, 
+                addressInput, aboutInput, skillsInput
+            ];
+            
+            inputs.forEach(input => {
+                input.addEventListener('input', updatePreview);
+            });
+            
+            // Слушатели для динамических полей опыта и образования
+            experienceContainer.addEventListener('input', (e) => {
+                if (e.target.classList.contains('exp-input')) {
+                    updatePreview();
+                }
+            });
+            
+            educationContainer.addEventListener('input', (e) => {
+                if (e.target.classList.contains('edu-input')) {
+                    updatePreview();
+                }
+            });
+        }
+        
+        function addExperienceField() {
+            const expId = Date.now();
+            const expHtml = `
+                <div class="experience-form" data-id="${expId}">
+                    <div class="form-group">
+                        <label>Компания</label>
+                        <input type="text" class="exp-input exp-company" data-id="${expId}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Должность</label>
+                        <input type="text" class="exp-input exp-position" data-id="${expId}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Период работы</label>
+                        <input type="text" class="exp-input exp-period" data-id="${expId}" placeholder="Пример: 2018-2022">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Описание</label>
+                        <textarea class="exp-input exp-description" data-id="${expId}"></textarea>
+                    </div>
+                    <button class="remove-exp" data-id="${expId}">Удалить</button>
+                </div>
+            `;
+            
+            experienceContainer.insertAdjacentHTML('beforeend', expHtml);
+            
+            // Добавляем обработчик для кнопки удаления
+            document.querySelector(`.remove-exp[data-id="${expId}"]`).addEventListener('click', function() {
+                this.parentElement.remove();
+                updatePreview();
+            });
+            
+            // Добавляем слушатели для новых полей ввода
+            const newInputs = document.querySelectorAll(`[data-id="${expId}"]`);
+            newInputs.forEach(input => {
+                if (input.classList.contains('exp-input')) {
+                    input.addEventListener('input', updatePreview);
+                }
+            });
+        }
+        
+        function addEducationField() {
+            const eduId = Date.now();
+            const eduHtml = `
+                <div class="education-form" data-id="${eduId}">
+                    <div class="form-group">
+                        <label>Учебное заведение</label>
+                        <input type="text" class="edu-input edu-institution" data-id="${eduId}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Специальность</label>
+                        <input type="text" class="edu-input edu-specialty" data-id="${eduId}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Период обучения</label>
+                        <input type="text" class="edu-input edu-period" data-id="${eduId}" placeholder="Пример: 2014-2018">
+                    </div>
+                    <button class="remove-edu" data-id="${eduId}">Удалить</button>
+                </div>
+            `;
+            
+            educationContainer.insertAdjacentHTML('beforeend', eduHtml);
+            
+            // Добавляем обработчик для кнопки удаления
+            document.querySelector(`.remove-edu[data-id="${eduId}"]`).addEventListener('click', function() {
+                this.parentElement.remove();
+                updatePreview();
+            });
+            
+            // Добавляем слушатели для новых полей ввода
+            const newInputs = document.querySelectorAll(`[data-id="${eduId}"]`);
+            newInputs.forEach(input => {
+                if (input.classList.contains('edu-input')) {
+                    input.addEventListener('input', updatePreview);
+                }
+            });
+        }
+        
+        function updatePreview() {
+            // Основная информация
+            previewFullName.textContent = fullNameInput.value || 'Иванов Иван Иванович';
+            previewProfession.textContent = professionInput.value || 'Веб-разработчик';
+            
+            const contacts = [];
+            if (emailInput.value) contacts.push(emailInput.value);
+            if (phoneInput.value) contacts.push(phoneInput.value);
+            if (addressInput.value) contacts.push(addressInput.value);
+            previewContacts.textContent = contacts.join(' | ') || 'example@email.com | +7 (123) 456-78-90 | г. Москва';
+            
+            previewAbout.textContent = aboutInput.value || 'Опытный веб-разработчик с более чем 5-летним стажем. Специализируюсь на создании адаптивных и пользовательских интерфейсов.';
+            
+            // Опыт работы
+            previewExperience.innerHTML = '';
+            const expForms = document.querySelectorAll('.experience-form');
+            
+            if (expForms.length === 0) {
+                previewExperience.innerHTML = `
+                    <div class="experience-item">
+                        <h3>Веб-разработчик в компании "ТехноПарк"</h3>
+                        <p class="experience-date">2018-2022</p>
+                        <p>Разработка и поддержка клиентской части веб-приложений. Оптимизация производительности. Работа в команде с дизайнерами и бэкенд-разработчиками.</p>
+                    </div>
+                `;
+            } else {
+                expForms.forEach(form => {
+                    const company = form.querySelector('.exp-company').value || 'Название компании';
+                    const position = form.querySelector('.exp-position').value || 'Должность';
+                    const period = form.querySelector('.exp-period').value || 'Период работы';
+                    const description = form.querySelector('.exp-description').value || 'Описание обязанностей и достижений на этой должности.';
+                    
+                    const expItem = document.createElement('div');
+                    expItem.className = 'experience-item';
+                    expItem.innerHTML = `
+                        <h3>${position} в компании "${company}"</h3>
+                        <p class="experience-date">${period}</p>
+                        <p>${description}</p>
+                    `;
+                    
+                    previewExperience.appendChild(expItem);
+                });
+            }
+            
+            // Образование
+            previewEducation.innerHTML = '';
+            const eduForms = document.querySelectorAll('.education-form');
+            
+            if (eduForms.length === 0) {
+                previewEducation.innerHTML = `
+                    <div class="education-item">
+                        <h3>Московский Государственный Университет</h3>
+                        <p class="education-date">2014-2018</p>
+                        <p>Бакалавр компьютерных наук</p>
+                    </div>
+                `;
+            } else {
+                eduForms.forEach(form => {
+                    const institution = form.querySelector('.edu-institution').value || 'Учебное заведение';
+                    const specialty = form.querySelector('.edu-specialty').value || 'Специальность';
+                    const period = form.querySelector('.edu-period').value || 'Период обучения';
+                    
+                    const eduItem = document.createElement('div');
+                    eduItem.className = 'education-item';
+                    eduItem.innerHTML = `
+                        <h3>${institution}</h3>
+                        <p class="education-date">${period}</p>
+                        <p>${specialty}</p>
+                    `;
+                    
+                    previewEducation.appendChild(eduItem);
+                });
+            }
+            
+            // Навыки
+            previewSkills.innerHTML = '';
+            const skills = skillsInput.value ? skillsInput.value.split(',').map(skill => skill.trim()) : ['HTML', 'CSS', 'JavaScript'];
+            
+            skills.forEach(skill => {
+                if (skill) {
+                    const skillTag = document.createElement('span');
+                    skillTag.className = 'skill-tag';
+                    skillTag.textContent = skill;
+                    previewSkills.appendChild(skillTag);
+                }
+            });
+        }
+        
+        function saveResume() {
+            const resumeName = resumeNameInput.value.trim();
+            if (!resumeName) {
+                alert('Пожалуйста, введите название для резюме');
+                return;
+            }
+            
+            // Собираем данные опыта работы
+            const experiences = [];
+            document.querySelectorAll('.experience-form').forEach(form => {
+                experiences.push({
+                    company: form.querySelector('.exp-company').value,
+                    position: form.querySelector('.exp-position').value,
+                    period: form.querySelector('.exp-period').value,
+                    description: form.querySelector('.exp-description').value
+                });
+            });
+            
+            // Собираем данные образования
+            const educations = [];
+            document.querySelectorAll('.education-form').forEach(form => {
+                educations.push({
+                    institution: form.querySelector('.edu-institution').value,
+                    specialty: form.querySelector('.edu-specialty').value,
+                    period: form.querySelector('.edu-period').value
+                });
+            });
+            
+            // Собираем все данные резюме
+            const resumeData = {
+                name: resumeName,
+                fullName: fullNameInput.value,
+                profession: professionInput.value,
+                email: emailInput.value,
+                phone: phoneInput.value,
+                address: addressInput.value,
+                about: aboutInput.value,
+                skills: skillsInput.value,
+                experiences: experiences,
+                educations: educations,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Сохраняем в localStorage
+            let savedResumes = JSON.parse(localStorage.getItem('resumes')) || {};
+            savedResumes[resumeName] = resumeData;
+            localStorage.setItem('resumes', JSON.stringify(savedResumes));
+            
+            alert(`Резюме "${resumeName}" сохранено!`);
+            loadSavedResumes();
+        }
+        
+        function loadSavedResumes() {
+            const savedResumes = JSON.parse(localStorage.getItem('resumes')) || {};
+            resumeList.innerHTML = '';
+            
+            if (Object.keys(savedResumes).length === 0) {
+                resumeList.innerHTML = '<p>Нет сохранённых резюме</p>';
+                return;
+            }
+            
+            Object.entries(savedResumes).forEach(([name, data]) => {
+                const resumeItem = document.createElement('div');
+                resumeItem.className = 'resume-item';
+                resumeItem.innerHTML = `
+                    <strong>${name}</strong> (${new Date(data.createdAt).toLocaleDateString()})
+                    <button class="load-resume" data-name="${name}">Загрузить</button>
+                    <button class="delete-resume" data-name="${name}">Удалить</button>
+                `;
+                
+                resumeList.appendChild(resumeItem);
+            });
+            
+            // Добавляем обработчики для кнопок загрузки и удаления
+            document.querySelectorAll('.load-resume').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    loadResume(this.dataset.name);
+                });
+            });
+            
+            document.querySelectorAll('.delete-resume').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    deleteResume(this.dataset.name);
+                });
+            });
+        }
+        
+        function loadResume(name) {
+            const savedResumes = JSON.parse(localStorage.getItem('resumes')) || {};
+            const resumeData = savedResumes[name];
+            
+            if (!resumeData) {
+                alert('Резюме не найдено');
+                return;
+            }
+            
+            // Заполняем основные поля
+            resumeNameInput.value = name;
+            fullNameInput.value = resumeData.fullName || '';
+            professionInput.value = resumeData.profession || '';
+            emailInput.value = resumeData.email || '';
+            phoneInput.value = resumeData.phone || '';
+            addressInput.value = resumeData.address || '';
+            aboutInput.value = resumeData.about || '';
+            skillsInput.value = resumeData.skills || '';
+            
+            // Заполняем опыт работы
+            experienceContainer.innerHTML = '';
+            if (resumeData.experiences && resumeData.experiences.length > 0) {
+                resumeData.experiences.forEach(exp => {
+                    addExperienceField();
+                    const lastExp = experienceContainer.lastElementChild;
+                    lastExp.querySelector('.exp-company').value = exp.company || '';
+                    lastExp.querySelector('.exp-position').value = exp.position || '';
+                    lastExp.querySelector('.exp-period').value = exp.period || '';
+                    lastExp.querySelector('.exp-description').value = exp.description || '';
+                });
+            }
+            
+            // Заполняем образование
+            educationContainer.innerHTML = '';
+            if (resumeData.educations && resumeData.educations.length > 0) {
+                resumeData.educations.forEach(edu => {
+                    addEducationField();
+                    const lastEdu = educationContainer.lastElementChild;
+                    lastEdu.querySelector('.edu-institution').value = edu.institution || '';
+                    lastEdu.querySelector('.edu-specialty').value = edu.specialty || '';
+                    lastEdu.querySelector('.edu-period').value = edu.period || '';
+                });
+            }
+            
+            updatePreview();
+        }
+        
+        function deleteResume(name) {
+            if (!confirm(`Вы уверены, что хотите удалить резюме "${name}"?`)) {
+                return;
+            }
+            
+            const savedResumes = JSON.parse(localStorage.getItem('resumes')) || {};
+            delete savedResumes[name];
+            localStorage.setItem('resumes', JSON.stringify(savedResumes));
+            
+            loadSavedResumes();
+        }
+        
+        function exportToPdf() {
+            const resumePreview = document.getElementById('resumePreview');
+            
+            html2canvas(resumePreview, {
+                scale: 2,
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                // Добавляем новые страницы, если контент не помещается
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                const fileName = fullNameInput.value ? `${fullNameInput.value}_резюме.pdf` : 'резюме.pdf';
+                pdf.save(fileName);
+            });
+        }
+    </script>
 </body>
 </html>
